@@ -35,12 +35,23 @@ export function SiteHeader() {
           <Link to="/history" className={cn(link, "hidden sm:inline-flex")} activeProps={{ className: "text-foreground" }}>
             History
           </Link>
-          <Link to="/login" className={link} activeProps={{ className: "text-foreground" }}>
-            Log in
-          </Link>
-          <Link to="/signup" className="rounded-full bg-primary px-4 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/90">
-            Sign up
-          </Link>
+          {email ? (
+            <>
+              <span className="hidden max-w-40 truncate text-sm text-muted-foreground sm:inline" title={email}>{email}</span>
+              <button type="button" onClick={handleLogout} className={link}>
+                Log out
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className={link} activeProps={{ className: "text-foreground" }}>
+                Log in
+              </Link>
+              <Link to="/signup" className="rounded-full bg-primary px-4 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/90">
+                Sign up
+              </Link>
+            </>
+          )}
         </nav>
       </div>
     </header>

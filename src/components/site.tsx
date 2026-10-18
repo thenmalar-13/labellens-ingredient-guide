@@ -1,10 +1,27 @@
-import { Link } from "@tanstack/react-router";
-import type { ReactNode } from "react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState, type ReactNode } from "react";
 import { ScanLine } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
 export function SiteHeader() {
   const link = "rounded-full px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground";
+  const navigate = useNavigate();
+  const [email, setEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? null));
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      setEmail(session?.user?.email ?? null);
+    });
+    return () => sub.subscription.unsubscribe();
+  }, []);
+
+  async function handleLogout() {
+    await supabase.auth.signOut();
+    navigate({ to: "/", replace: true });
+  }
+
   return (
     <header className="sticky top-0 z-30 border-b border-border/70 bg-background/85 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
@@ -18,12 +35,23 @@ export function SiteHeader() {
           <Link to="/history" className={cn(link, "hidden sm:inline-flex")} activeProps={{ className: "text-foreground" }}>
             History
           </Link>
-          <Link to="/login" className={link} activeProps={{ className: "text-foreground" }}>
-            Log in
-          </Link>
-          <Link to="/signup" className="rounded-full bg-primary px-4 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/90">
-            Sign up
-          </Link>
+          {email ? (
+            <>
+              <span className="hidden max-w-40 truncate text-sm text-muted-foreground sm:inline" title={email}>{email}</span>
+              <button type="button" onClick={handleLogout} className={link}>
+                Log out
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className={link} activeProps={{ className: "text-foreground" }}>
+                Log in
+              </Link>
+              <Link to="/signup" className="rounded-full bg-primary px-4 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/90">
+                Sign up
+              </Link>
+            </>
+          )}
         </nav>
       </div>
     </header>

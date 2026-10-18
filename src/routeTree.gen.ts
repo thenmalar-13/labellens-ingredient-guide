@@ -10,9 +10,11 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as PasteRouteImport } from './routes/paste'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ResultsRouteImport } from './routes/results'
 import { Route as ReviewRouteImport } from './routes/review'
 import { Route as ScanRouteImport } from './routes/scan'
@@ -21,6 +23,11 @@ import { Route as SignupRouteImport } from './routes/signup'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HistoryRoute = HistoryRouteImport.update({
@@ -36,6 +43,11 @@ const LoginRoute = LoginRouteImport.update({
 const PasteRoute = PasteRouteImport.update({
   id: '/paste',
   path: '/paste',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResultsRoute = ResultsRouteImport.update({
@@ -61,9 +73,11 @@ const SignupRoute = SignupRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/history': typeof HistoryRoute
   '/login': typeof LoginRoute
   '/paste': typeof PasteRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/results': typeof ResultsRoute
   '/review': typeof ReviewRoute
   '/scan': typeof ScanRoute
@@ -71,9 +85,11 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/history': typeof HistoryRoute
   '/login': typeof LoginRoute
   '/paste': typeof PasteRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/results': typeof ResultsRoute
   '/review': typeof ReviewRoute
   '/scan': typeof ScanRoute
@@ -82,9 +98,11 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/history': typeof HistoryRoute
   '/login': typeof LoginRoute
   '/paste': typeof PasteRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/results': typeof ResultsRoute
   '/review': typeof ReviewRoute
   '/scan': typeof ScanRoute
@@ -94,9 +112,11 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/forgot-password'
     | '/history'
     | '/login'
     | '/paste'
+    | '/reset-password'
     | '/results'
     | '/review'
     | '/scan'
@@ -104,9 +124,11 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/forgot-password'
     | '/history'
     | '/login'
     | '/paste'
+    | '/reset-password'
     | '/results'
     | '/review'
     | '/scan'
@@ -114,9 +136,11 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/forgot-password'
     | '/history'
     | '/login'
     | '/paste'
+    | '/reset-password'
     | '/results'
     | '/review'
     | '/scan'
@@ -125,9 +149,11 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   HistoryRoute: typeof HistoryRoute
   LoginRoute: typeof LoginRoute
   PasteRoute: typeof PasteRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   ResultsRoute: typeof ResultsRoute
   ReviewRoute: typeof ReviewRoute
   ScanRoute: typeof ScanRoute
@@ -141,6 +167,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/history': {
@@ -162,6 +195,13 @@ declare module '@tanstack/react-router' {
       path: '/paste'
       fullPath: '/paste'
       preLoaderRoute: typeof PasteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/results': {
@@ -197,9 +237,11 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   HistoryRoute: HistoryRoute,
   LoginRoute: LoginRoute,
   PasteRoute: PasteRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   ResultsRoute: ResultsRoute,
   ReviewRoute: ReviewRoute,
   ScanRoute: ScanRoute,

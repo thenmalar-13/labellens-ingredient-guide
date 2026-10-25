@@ -1,8 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { useState } from "react";
 import { AlertTriangle, BookOpen, ExternalLink, Gauge, Target } from "lucide-react";
 import type { ReactNode } from "react";
 import { DemoBadge, Notice, Page, Steps, btnGhost, btnPrimary } from "@/components/site";
 import { resetDraft, useDraft } from "@/lib/scan-store";
+import { useSessionState } from "@/hooks/use-session";
+import { createScan } from "@/lib/scans.functions";
 
 export const Route = createFileRoute("/results")({
   head: () => ({

@@ -7,6 +7,7 @@ import { Notice, Page, btnGhost, btnPrimary } from "@/components/site";
 import { useSessionState } from "@/hooks/use-session";
 import { deleteScan, listScans, type ScanSummary } from "@/lib/scans.functions";
 import { setDraft } from "@/lib/scan-store";
+import type { ScanAnalysis } from "@/lib/analysis";
 
 export const Route = createFileRoute("/history")({
   head: () => ({
@@ -68,6 +69,7 @@ function HistoryPage() {
       ingredients: scan.ingredients,
       imageName: null,
       imagePreview: null,
+      savedResults: scan.results as ScanAnalysis | null,
     });
     navigate({ to: "/results" });
   }
@@ -97,7 +99,7 @@ function HistoryPage() {
     <Page
       eyebrow="History"
       title="Your scans"
-      intro="Scans you save are kept here, visible only to your account. Saving stores the ingredient list you reviewed — analysis results aren't connected yet."
+      intro="Scans you save are kept here, visible only to your account. Each saved scan stores the ingredient list and, for personal-care products, the completed analysis."
     >
       {scansQuery.isPending && <p className="text-sm text-muted-foreground" role="status">Loading your scans…</p>}
 

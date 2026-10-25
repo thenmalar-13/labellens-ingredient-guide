@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { parseIngredients } from "@/lib/scan-store";
+import { analyzeScan as analyzeScanPure, type ScanAnalysis } from "@/lib/analysis";
 
 export type ScanCategory = "food" | "personal-care";
 
@@ -9,6 +10,8 @@ export interface ScanSummary {
   category: ScanCategory;
   ingredients: string[];
   createdAt: string;
+  /** Saved analysis results, if any. */
+  results: ScanAnalysis | null;
 }
 
 /** Load the signed-in user's saved scans, newest first. Ownership comes from the session, not the client. */
@@ -17,7 +20,7 @@ export const listScans = createServerFn({ method: "GET" })
   .handler(async ({ context }): Promise<ScanSummary[]> => {
     const { data, error } = await context.supabase
       .from("scans")
-      .select("id, category, ingredient_text, created_at")
+      .select("id, category, ingredient_text, created_at, results")
       .order("created_at", { ascending: false })
       .limit(200);
     if (error) throw new Error("Could not load your saved scans. Please try again.");
@@ -26,6 +29,7 @@ export const listScans = createServerFn({ method: "GET" })
       category: row.category === "personal-care" ? "personal-care" : "food",
       ingredients: parseIngredients(row.ingredient_text),
       createdAt: row.created_at,
+      results: (row.results as ScanAnalysis | null) ?? null,
     }));
   });
 
@@ -36,7 +40,7 @@ export const listScans = createServerFn({ method: "GET" })
  */
 export const createScan = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { category: ScanCategory; ingredients: string[] }) => {
+  .inputValidator((input: { category: ScanCategory; ingredients: string[]; results?: ScanAnalysis | null }) => {
     const category: ScanCategory = input?.category === "personal-care" ? "personal-care" : "food";
     const ingredients = (Array.isArray(input?.ingredients) ? input.ingredients : [])
       .map((s) => String(s).trim())
@@ -46,13 +50,16 @@ export const createScan = createServerFn({ method: "POST" })
     if (ingredients.some((s) => s.length > 300)) throw new Error("An ingredient name is too long to save.");
     const ingredientText = ingredients.join(", ");
     if (ingredientText.length > 20000) throw new Error("This ingredient list is too long to save.");
-    return { category, ingredientText };
+    // Accept results only if they match the category being saved; otherwise drop.
+    const results = input?.results && input.results.category === category ? input.results : null;
+    return { category, ingredientText, results };
   })
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.from("scans").insert({
       user_id: context.userId,
       category: data.category,
       ingredient_text: data.ingredientText,
+      results: data.results,
     });
     if (error) {
       console.error("[createScan] insert failed:", error.message);
@@ -82,4 +89,31 @@ export const deleteScan = createServerFn({ method: "POST" })
       throw new Error("Could not delete this scan. Please try again.");
     }
     return { deleted: count ?? 0 };
+  });
+
+/**
+ * Run ingredient analysis for the signed-in user's current scan.
+ * Personal-care: real curated analysis with keyless PubChem enrichment.
+ * Food: honest "not yet supported" status per ingredient.
+ * Runs server-side so the analysis and any upstream fetches never reach the client.
+ */
+export const analyzeScan = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { category: ScanCategory; ingredients: string[] }) => {
+    const category: ScanCategory = input?.category === "personal-care" ? "personal-care" : "food";
+    const ingredients = (Array.isArray(input?.ingredients) ? input.ingredients : [])
+      .map((s) => String(s).trim())
+      .filter(Boolean)
+      .slice(0, 200);
+    if (ingredients.length === 0) throw new Error("Add at least one ingredient before analyzing.");
+    if (ingredients.some((s) => s.length > 300)) throw new Error("An ingredient name is too long to analyze.");
+    return { category, ingredients };
+  })
+  .handler(async ({ data }): Promise<ScanAnalysis> => {
+    try {
+      return await analyzeScanPure(data.category, data.ingredients);
+    } catch (err) {
+      console.error("[analyzeScan] failed:", err instanceof Error ? err.message : String(err));
+      throw new Error("Could not analyze these ingredients right now. Please try again.");
+    }
   });

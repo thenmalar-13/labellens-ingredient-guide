@@ -8,6 +8,8 @@ export interface ScanDraft {
   imageName: string | null;
   imagePreview: string | null;
   ingredients: string[];
+  /** Saved analysis restored from history, used to avoid re-running on reopen. */
+  savedResults: import("@/lib/analysis").ScanAnalysis | null;
 }
 
 const initial: ScanDraft = {
@@ -16,6 +18,7 @@ const initial: ScanDraft = {
   imageName: null,
   imagePreview: null,
   ingredients: [],
+  savedResults: null,
 };
 
 let state: ScanDraft = initial;

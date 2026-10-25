@@ -59,7 +59,7 @@ function ResultsPage() {
     <Page wide eyebrow={draft.category === "food" ? "Food" : "Personal care"} title={`${items.length} ingredient${items.length === 1 ? "" : "s"} reviewed`}>
       <Steps current={3} />
       <Notice>
-        <strong>Preview layout only.</strong> Ingredient analysis isn't connected yet, so no purpose, evidence, concern, or confidence information is shown. Nothing on this page is a scientific assessment.
+        <strong>Preview layout only.</strong> Ingredient analysis isn't connected yet, so no purpose, evidence, concern, or confidence information is shown. Nothing on this page is a scientific assessment. Saving the ingredient list you reviewed to your history does work.
       </Notice>
       <div className="mt-8 grid gap-4 md:grid-cols-2">
         {items.map((name, i) => (

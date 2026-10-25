@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { AlertTriangle, BookOpen, ExternalLink, Gauge, Target } from "lucide-react";
 import type { ReactNode } from "react";
-import { DemoBadge, Notice, Page, Steps, btnGhost, btnPrimary } from "@/components/site";
+import { Notice, Page, Steps, btnGhost, btnPrimary } from "@/components/site";
 import { resetDraft, useDraft } from "@/lib/scan-store";
 import { useSessionState } from "@/hooks/use-session";
 import { createScan } from "@/lib/scans.functions";
@@ -84,12 +84,45 @@ function ResultsPage() {
           </article>
         ))}
       </div>
+      <section aria-label="Save this scan" className="mt-8 rounded-2xl border border-border bg-card p-5">
+        {session === "signed-in" ? (
+          saveState === "saved" ? (
+            <p className="text-sm text-foreground" role="status">
+              Saved to your history. <Link to="/history" className="font-medium text-primary underline underline-offset-2">View history</Link>
+            </p>
+          ) : (
+            <>
+              <div className="flex flex-wrap items-center gap-4">
+                <button
+                  type="button"
+                  className={btnPrimary}
+                  disabled={saveMutation.isPending}
+                  onClick={() => saveMutation.mutate({ category: draft.category, ingredients: items })}
+                >
+                  {saveMutation.isPending ? "Saving…" : "Save scan"}
+                </button>
+                <p className="text-sm text-muted-foreground">Saves the ingredient list you reviewed, private to your account.</p>
+              </div>
+              {saveState === "error" && (
+                <p role="alert" className="mt-3 text-sm text-destructive">
+                  Couldn't save this scan — nothing was saved. Please try again.
+                </p>
+              )}
+            </>
+          )
+        ) : session === "signed-out" ? (
+          <p className="text-sm text-muted-foreground">
+            <Link to="/login" className="font-medium text-primary underline underline-offset-2">Sign in</Link>{" "}
+            to save this scan to your private history. Without an account, scans stay on this page only.
+          </p>
+        ) : (
+          <p className="text-sm text-muted-foreground" role="status">Checking your sign-in status…</p>
+        )}
+      </section>
+
       <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:justify-between">
         <Link to="/review" className={btnGhost}>Edit ingredients</Link>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <span className="self-center"><DemoBadge>Saving requires an account</DemoBadge></span>
-          <Link to="/" onClick={() => resetDraft()} className={btnPrimary}>Start a new scan</Link>
-        </div>
+        <Link to="/" onClick={() => resetDraft()} className={btnPrimary}>Start a new scan</Link>
       </div>
     </Page>
   );

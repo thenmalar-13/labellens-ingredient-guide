@@ -32,7 +32,20 @@ function Field({ icon, label, children }: { icon: ReactNode; label: string; chil
 
 function ResultsPage() {
   const draft = useDraft();
+  const session = useSessionState();
+  const queryClient = useQueryClient();
+  const saveScan = useServerFn(createScan);
+  const [saveState, setSaveState] = useState<"idle" | "saved" | "error">("idle");
   const items = draft.ingredients;
+
+  const saveMutation = useMutation({
+    mutationFn: (vars: { category: "food" | "personal-care"; ingredients: string[] }) => saveScan({ data: vars }),
+    onSuccess: () => {
+      setSaveState("saved");
+      queryClient.invalidateQueries({ queryKey: ["scans"] });
+    },
+    onError: () => setSaveState("error"),
+  });
 
   if (items.length === 0) {
     return (

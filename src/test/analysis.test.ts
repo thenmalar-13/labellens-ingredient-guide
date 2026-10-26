@@ -133,9 +133,9 @@ describe("full analysis run", () => {
       "Zzq fictional compound",
       "Glycerin",
     ]);
-    expect(run.ingredients[0].matched).toBe(true);
-    expect(run.ingredients[1].matched).toBe(false);
-    expect(run.ingredients[2].matched).toBe(true);
+    expect(run.ingredients[0]!.matched).toBe(true);
+    expect(run.ingredients[1]!.matched).toBe(false);
+    expect(run.ingredients[2]!.matched).toBe(true);
     expect(run.disclaimer).toMatch(/not medical or regulatory advice/i);
   });
 

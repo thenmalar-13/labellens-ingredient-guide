@@ -110,8 +110,10 @@ describe("PubChem enrichment with graceful fallback", () => {
   });
 
   it("falls back to a PubChem search link when enrichment fails, and analysis still completes", async () => {
-    stubFetch(() => Promise.reject(new Error("offline")));
-    const result = await analyzePersonalCareIngredient("Aqua");
+    // An entry without a curated CID whose live lookup also fails.
+    const entry = findPersonalCareIngredient("Glycerin")!;
+    expect(entry).toBeDefined();
+    const result = await analyzePersonalCareIngredient(entry.name, async () => null);
     expect(result.matched).toBe(true);
     expect(result.sources.some((s) => s.url.includes("#query="))).toBe(true);
   });

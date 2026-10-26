@@ -110,10 +110,8 @@ describe("PubChem enrichment with graceful fallback", () => {
   });
 
   it("falls back to a PubChem search link when enrichment fails, and analysis still completes", async () => {
-    // An entry without a curated CID whose live lookup also fails.
-    const entry = findPersonalCareIngredient("Glycerin")!;
-    expect(entry).toBeDefined();
-    const result = await analyzePersonalCareIngredient(entry.name, async () => null);
+    // "Cetearyl Alcohol" has no curated CID; a failed live lookup leaves a search link.
+    const result = await analyzePersonalCareIngredient("Cetearyl Alcohol");
     expect(result.matched).toBe(true);
     expect(result.sources.some((s) => s.url.includes("#query="))).toBe(true);
   });

@@ -110,6 +110,7 @@ describe("PubChem enrichment with graceful fallback", () => {
   });
 
   it("falls back to a PubChem search link when enrichment fails, and analysis still completes", async () => {
+    stubFetch(() => Promise.reject(new Error("offline")));
     // "Cetearyl Alcohol" has no curated CID; a failed live lookup leaves a search link.
     const result = await analyzePersonalCareIngredient("Cetearyl Alcohol");
     expect(result.matched).toBe(true);

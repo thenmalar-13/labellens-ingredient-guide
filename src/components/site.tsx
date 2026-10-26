@@ -61,7 +61,7 @@ export function SiteHeader() {
 export function SiteFooter() {
   return (
     <footer className="border-t border-border/70 py-8 text-center text-xs text-muted-foreground">
-      LabelLens is an informational tool and not medical advice. Phase 1 preview — analysis is not connected yet.
+      LabelLens is an informational tool and not medical advice. Analysis covers personal-care ingredients only.
     </footer>
   );
 }

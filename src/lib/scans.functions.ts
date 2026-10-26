@@ -60,7 +60,7 @@ export const createScan = createServerFn({ method: "POST" })
       user_id: context.userId,
       category: data.category,
       ingredient_text: data.ingredientText,
-      results: data.results,
+      results: (data.results ?? null) as unknown as Json,
     });
     if (error) {
       console.error("[createScan] insert failed:", error.message);

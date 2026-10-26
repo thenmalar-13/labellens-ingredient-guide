@@ -228,9 +228,9 @@ export async function analyzePersonalCareIngredient(
   }
 
   // Resolve a CID: prefer the curated one, else ask PubChem.
-  let cid = entry.pubchemCid;
-  if (cid === undefined) {
-    cid = (await fetchCid(entry.name)) ?? null;
+  let cid: number | null = entry.pubchemCid ?? null;
+  if (cid === null) {
+    cid = await fetchCid(entry.name);
   }
 
   sources.push({ label: "CosIng search", url: cosingSearchUrl(entry.name) });

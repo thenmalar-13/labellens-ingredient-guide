@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { parseIngredients } from "@/lib/scan-store";
 import { analyzeScan as analyzeScanPure, type ScanAnalysis } from "@/lib/analysis";
+import type { Json } from "@/integrations/supabase/types";
 
 export type ScanCategory = "food" | "personal-care";
 

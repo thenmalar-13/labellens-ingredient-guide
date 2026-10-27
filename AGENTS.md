@@ -9,3 +9,4 @@
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
 - Scan history persists in the `public.scans` table. Access goes through server functions in `src/lib/scans.functions.ts` (`requireSupabaseAuth`); ownership is enforced by RLS policies (`auth.uid() = user_id`) and the user ID is always taken from the authenticated session, never from client input. The in-memory draft store in `src/lib/scan-store.ts` still holds the active scan flow.
+- Keep `.env` out of `.gitignore` — it holds only the public backend URL and publishable key, and preview/publish builds read it from the committed snapshot. It was gitignored on 2026-10-25 and every preview build then shipped without `VITE_SUPABASE_*`, blank-screening the preview with "Missing Supabase environment variable(s)".

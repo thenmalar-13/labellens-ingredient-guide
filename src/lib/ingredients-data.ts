@@ -303,7 +303,7 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Humectant", "Skin conditioning"],
     notes:
       "A glycosaminoglycan that binds water; used as a humectant across molecular-weight grades.",
-    pubchemCid: 24659,
+
   },
   {
     name: "Dimethicone",
@@ -311,7 +311,7 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Emollient", "Skin conditioning"],
     notes:
       "A silicone emollient that forms a breathable, non-greasy film.",
-    pubchemCid: 7597,
+
   },
   {
     name: "Cyclomethicone",
@@ -319,7 +319,7 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Emollient", "Solvent"],
     notes:
       "A volatile silicone used for a light, fast-drying skin feel; regulatory scrutiny varies by jurisdiction.",
-    pubchemCid: 7589,
+
   },
   {
     name: "Sodium Chloride",
@@ -336,7 +336,7 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Thickener", "Stabilizing agent"],
     notes:
       "A polysaccharide gum used to thicken and stabilize emulsions and gels.",
-    pubchemCid: 71586,
+
   },
   {
     name: "Carbomer",
@@ -366,7 +366,7 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Emulsifier", "Solubilizing agent"],
     notes:
       "A non-ionic emulsifier/solubilizer for oils and fragrances.",
-    pubchemCid: 443366,
+
   },
   {
     name: "Polysorbate 80",
@@ -374,7 +374,7 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Emulsifier", "Solubilizing agent"],
     notes:
       "A non-ionic emulsifier/solubilizer widely used in cosmetics and pharmaceuticals.",
-    pubchemCid: 5281957,
+
   },
   {
     name: "Sorbitan Oleate",
@@ -407,7 +407,7 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Emollient"],
     notes:
       "A fractionated coconut-oil emollient; stable and non-greasy.",
-    pubchemCid: 10952,
+
   },
   {
     name: "Shea Butter",
@@ -422,7 +422,7 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Emollient", "Skin conditioning"],
     notes:
       "A solid plant fat used as an emollient.",
-    pubchemCid: 101873657,
+
   },
   {
     name: "Argan Oil",
@@ -646,7 +646,7 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Abrasive", "Bulking agent"],
     notes:
       "A naturally occurring clay used as an absorbent and bulking agent.",
-    pubchemCid: 56841936,
+
   },
   {
     name: "Talc",

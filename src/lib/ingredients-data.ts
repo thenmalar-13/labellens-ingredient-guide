@@ -65,7 +65,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Solvent"],
     notes:
       "Universal cosmetic solvent. Listed as the vehicle that carries the other ingredients.",
-    pubchemCid: 962,
+    pubchemCid: 962,    pubchemCid: 962,
+
   },
   {
     name: "Glycerin",
@@ -73,7 +74,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Humectant", "Skin conditioning"],
     notes:
       "A humectant that draws water into the upper layers of skin; one of the most common moisturizing agents in cosmetics.",
-    pubchemCid: 753,
+    pubchemCid: 753,    pubchemCid: 753,
+
   },
   {
     name: "Cetyl Alcohol",
@@ -81,7 +83,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Emollient", "Emulsifier", "Thickener"],
     notes:
       "A fatty alcohol (not an intoxicating alcohol) used to thicken and stabilize emulsions and give a smooth skin feel.",
-    pubchemCid: 2682,
+    pubchemCid: 2682,    pubchemCid: 2682,
+
   },
   {
     name: "Stearyl Alcohol",
@@ -89,14 +92,16 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Emollient", "Emulsifier", "Thickener"],
     notes:
       "A fatty alcohol used as a co-emulsifier and to give body to creams and lotions.",
-    pubchemCid: 8221,
+    pubchemCid: 8221,    pubchemCid: 8221,
+
   },
   {
     name: "Cetearyl Alcohol",
     aliases: ["cetearyl alcohol", "cetostearyl alcohol"],
     functions: ["Emollient", "Emulsifier", "Thickener"],
     notes:
-      "A blend of cetyl and stearyl alcohols used as a non-drying emollient and stabilizer.",
+      "A blend of cetyl and stearyl alcohols used as a non-drying emollient and stabilizer.",    pubchemCid: 62238,
+
   },
   {
     name: "Sodium Lauryl Sulfate",
@@ -104,14 +109,16 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Surfactant"],
     notes:
       "An anionic surfactant and foaming agent. Whether it is irritating depends on concentration, contact time, and formulation.",
-    pubchemCid: 34233,
+    pubchemCid: 34233,    pubchemCid: 3423265,
+
   },
   {
     name: "Sodium Laureth Sulfate",
     aliases: ["sodium laureth sulfate", "sles", "sodium lauryl ether sulfate"],
     functions: ["Surfactant"],
     notes:
-      "An ethoxylated anionic surfactant; milder than sodium lauryl sulfate at typical leave-on/rinse-off concentrations.",
+      "An ethoxylated anionic surfactant; milder than sodium lauryl sulfate at typical leave-on/rinse-off concentrations.",    pubchemCid: 23665884,
+
   },
   {
     name: "Sodium Lauroyl Sarcosinate",
@@ -119,14 +126,16 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Surfactant", "Antimicrobial"],
     notes:
       "An anionic surfactant derived from sarcosine; used for foaming and cleansing.",
-    pubchemCid: 23674831,
+    pubchemCid: 23674831,    pubchemCid: 23668817,
+
   },
   {
     name: "Coco-Glucoside",
     aliases: ["coco-glucoside", "cocoglucoside"],
     functions: ["Surfactant"],
     notes:
-      "A mild non-ionic surfactant from coconut-derived alcohols and glucose.",
+      "A mild non-ionic surfactant from coconut-derived alcohols and glucose.",    pubchemCid: 369373,
+
   },
   {
     name: "Decyl Glucoside",
@@ -134,7 +143,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Surfactant"],
     notes:
       "A mild non-ionic surfactant used in sensitive-skin and baby formulations.",
-    pubchemCid: 3037542,
+    pubchemCid: 3037542,    pubchemCid: 62142,
+
   },
   {
     name: "Cocamidopropyl Betaine",
@@ -149,7 +159,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Preservative"],
     notes:
       "A widely used broad-spectrum preservative. EU limits its use in leave-on products.",
-    pubchemCid: 7603,
+    pubchemCid: 7603,    pubchemCid: 31236,
+
   },
   {
     name: "Methylparaben",
@@ -157,7 +168,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Preservative"],
     notes:
       "A paraben preservative. EU permits methylparaben up to a set maximum concentration; regulatory limits have changed over time.",
-    pubchemCid: 7456,
+    pubchemCid: 7456,    pubchemCid: 7456,
+
   },
   {
     name: "Ethylparaben",
@@ -165,7 +177,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Preservative"],
     notes:
       "A paraben preservative; EU restricted in some leave-on products for children.",
-    pubchemCid: 8439,
+    pubchemCid: 8439,    pubchemCid: 8434,
+
   },
   {
     name: "Propylparaben",
@@ -173,7 +186,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Preservative"],
     notes:
       "A paraben preservative; EU has stricter concentration limits than for methylparaben/ethylparaben.",
-    pubchemCid: 7175,
+    pubchemCid: 7175,    pubchemCid: 7175,
+
   },
   {
     name: "Butylparaben",
@@ -181,7 +195,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Preservative"],
     notes:
       "A paraben preservative; EU has the strictest limits among the common parabens.",
-    pubchemCid: 7184,
+    pubchemCid: 7184,    pubchemCid: 7184,
+
   },
   {
     name: "Sodium Benzoate",
@@ -189,7 +204,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Preservative"],
     notes:
       "A food-approved preservative also used in cosmetics; stable across a wide pH range.",
-    pubchemCid: 517055,
+    pubchemCid: 517055,    pubchemCid: 517055,
+
   },
   {
     name: "Potassium Sorbate",
@@ -197,7 +213,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Preservative"],
     notes:
       "A mild preservative effective against molds and yeasts.",
-    pubchemCid: 23676785,
+    pubchemCid: 23676785,    pubchemCid: 23676745,
+
   },
   {
     name: "Sorbic Acid",
@@ -205,7 +222,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Preservative"],
     notes:
       "An organic-acid preservative; works best in acidic formulations.",
-    pubchemCid: 6234,
+    pubchemCid: 6234,    pubchemCid: 643460,
+
   },
   {
     name: "Benzoic Acid",
@@ -213,7 +231,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Preservative"],
     notes:
       "An organic-acid preservative used in acidic cosmetics and foods.",
-    pubchemCid: 243,
+    pubchemCid: 243,    pubchemCid: 243,
+
   },
   {
     name: "Citric Acid",
@@ -221,7 +240,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Buffering agent", "pH adjuster"],
     notes:
       "Adjusts pH and acts as a mild chelating agent; very common in leave-on and rinse-off products.",
-    pubchemCid: 311,
+    pubchemCid: 311,    pubchemCid: 311,
+
   },
   {
     name: "Tocopherol",
@@ -229,7 +249,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Antioxidant", "Skin conditioning"],
     notes:
       "A lipid-soluble antioxidant used to slow rancidity of oils and provide skin conditioning.",
-    pubchemCid: 2116,
+    pubchemCid: 2116,    pubchemCid: 2116,
+
   },
   {
     name: "Tocopheryl Acetate",
@@ -237,7 +258,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Antioxidant", "Skin conditioning"],
     notes:
       "A more stable ester of vitamin E used for antioxidant protection and skin conditioning.",
-    pubchemCid: 8368,
+    pubchemCid: 8368,    pubchemCid: 2117,
+
   },
   {
     name: "Ascorbic Acid",
@@ -245,7 +267,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Antioxidant", "Buffering agent"],
     notes:
       "A water-soluble antioxidant; used for skin conditioning at low, stable pH.",
-    pubchemCid: 54670067,
+    pubchemCid: 54670067,    pubchemCid: 54670067,
+
   },
   {
     name: "Retinol",
@@ -253,7 +276,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Skin conditioning"],
     notes:
       "A vitamin A derivative for skin conditioning; effects are concentration-dependent and a frequent irritant at higher strengths.",
-    pubchemCid: 445354,
+    pubchemCid: 445354,    pubchemCid: 445354,
+
   },
   {
     name: "Niacinamide",
@@ -261,7 +285,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Skin conditioning"],
     notes:
       "A water-soluble form of vitamin B3 widely used for skin conditioning and barrier support.",
-    pubchemCid: 936,
+    pubchemCid: 936,    pubchemCid: 936,
+
   },
   {
     name: "Panthenol",
@@ -269,7 +294,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Skin conditioning", "Hair conditioning"],
     notes:
       "A provitamin of B5 used as a humectant and conditioning agent for skin and hair.",
-    pubchemCid: 4678,
+    pubchemCid: 4678,    pubchemCid: 4678,
+
   },
   {
     name: "Hyaluronic Acid",
@@ -301,7 +327,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Thickener", "Buffering agent"],
     notes:
       "Used to adjust viscosity and ionic strength; very common in gels and cleansers.",
-    pubchemCid: 5234,
+    pubchemCid: 5234,    pubchemCid: 5234,
+
   },
   {
     name: "Xanthan Gum",
@@ -323,7 +350,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     aliases: ["hydroxyethylcellulose", "hec", "hydroxyethyl cellulose"],
     functions: ["Thickener"],
     notes:
-      "A cellulose-derived thickener for aqueous formulations.",
+      "A cellulose-derived thickener for aqueous formulations.",    pubchemCid: 4327536,
+
   },
   {
     name: "Ceteareth-20",
@@ -354,7 +382,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Emulsifier"],
     notes:
       "A non-ionic emulsifier often paired with polysorbates.",
-    pubchemCid: 24231,
+    pubchemCid: 24231,    pubchemCid: 9920342,
+
   },
   {
     name: "Glyceryl Stearate",
@@ -362,7 +391,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Emulsifier", "Emollient"],
     notes:
       "An emulsifier and co-emollient that gives creams a smooth texture.",
-    pubchemCid: 8166,
+    pubchemCid: 8166,    pubchemCid: 93066,
+
   },
   {
     name: "PEG-100 Stearate",
@@ -414,7 +444,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Emollient", "Skin conditioning"],
     notes:
       "A saturated hydrocarbon emollient; commonly plant-derived (olive/sugar cane).",
-    pubchemCid: 7597,
+    pubchemCid: 7597,    pubchemCid: 8089,
+
   },
   {
     name: "Cetyl Palmitate",
@@ -422,7 +453,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Emollient"],
     notes:
       "An ester emollient that adds a dry, silky skin feel.",
-    pubchemCid: 9949,
+    pubchemCid: 9949,    pubchemCid: 10889,
+
   },
   {
     name: "Isopropyl Myristate",
@@ -430,7 +462,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Emollient", "Solubilizing agent"],
     notes:
       "An ester used to reduce greasiness and improve spreading.",
-    pubchemCid: 8067,
+    pubchemCid: 8067,    pubchemCid: 8042,
+
   },
   {
     name: "Isopropyl Palmitate",
@@ -438,7 +471,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Emollient"],
     notes:
       "An ester emollient that improves spreadability.",
-    pubchemCid: 10785,
+    pubchemCid: 10785,    pubchemCid: 8907,
+
   },
   {
     name: "Triethanolamine",
@@ -446,7 +480,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["pH adjuster", "Emulsifier"],
     notes:
       "A base used to neutralize acidic polymers and adjust pH.",
-    pubchemCid: 7618,
+    pubchemCid: 7618,    pubchemCid: 7618,
+
   },
   {
     name: "Disodium EDTA",
@@ -454,14 +489,16 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Chelating agent"],
     notes:
       "A chelating agent that binds trace metals and stabilizes formulations.",
-    pubchemCid: 8767,
+    pubchemCid: 8767,    pubchemCid: 9839867,
+
   },
   {
     name: "Tetrasodium EDTA",
     aliases: ["tetrasodium edta", "edta tetrasodium"],
     functions: ["Chelating agent"],
     notes:
-      "A chelating agent; stronger chelating form of EDTA.",
+      "A chelating agent; stronger chelating form of EDTA.",    pubchemCid: 6144,
+
   },
   {
     name: "Alcohol Denat.",
@@ -469,7 +506,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Solvent", "Antimicrobial"],
     notes:
       "Denatured ethanol used as a solvent and antimicrobial; can be drying at higher concentrations.",
-    pubchemCid: 702,
+    pubchemCid: 702,    pubchemCid: 702,
+
   },
   {
     name: "Benzyl Alcohol",
@@ -477,7 +515,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Preservative", "Solvent", "Fragrance"],
     notes:
       "A multifunctional preservative and fragrance ingredient; a listed EU allergen.",
-    pubchemCid: 244,
+    pubchemCid: 244,    pubchemCid: 244,
+
   },
   {
     name: "Salicylic Acid",
@@ -485,7 +524,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Antidandruff", "Antimicrobial", "pH adjuster"],
     notes:
       "A beta-hydroxy acid used for exfoliation and anti-dandruff action; regulatory limits vary.",
-    pubchemCid: 338,
+    pubchemCid: 338,    pubchemCid: 338,
+
   },
   {
     name: "Zinc Pyrithione",
@@ -493,14 +533,16 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Antidandruff"],
     notes:
       "An anti-dandruff active; regulatory approvals have narrowed in the EU.",
-    pubchemCid: 26043,
+    pubchemCid: 26043,    pubchemCid: 26041,
+
   },
   {
     name: "Selenium Sulfide",
     aliases: ["selenium sulfide", "selenium disulfide"],
     functions: ["Antidandruff"],
     notes:
-      "An anti-dandruff active; restricted to specific product types.",
+      "An anti-dandruff active; restricted to specific product types.",    pubchemCid: 24011,
+
   },
   {
     name: "Allantoin",
@@ -508,7 +550,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Skin conditioning"],
     notes:
       "A skin-conditioning agent associated with soothing claims.",
-    pubchemCid: 204,
+    pubchemCid: 204,    pubchemCid: 204,
+
   },
   {
     name: "Bisabolol",
@@ -516,14 +559,16 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Skin conditioning"],
     notes:
       "A plant-derived sesquiterpene alcohol used for skin conditioning.",
-    pubchemCid: 5370791,
+    pubchemCid: 5370791,    pubchemCid: 1549992,
+
   },
   {
     name: "Ceramide NP",
     aliases: ["ceramide np", "ceramide 3", "n-stearoyl sphinganine"],
     functions: ["Skin conditioning"],
     notes:
-      "A skin-identical lipid used in barrier-support formulations.",
+      "A skin-identical lipid used in barrier-support formulations.",    pubchemCid: 57378373,
+
   },
   {
     name: "Urea",
@@ -531,7 +576,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Humectant", "Skin conditioning"],
     notes:
       "A humectant and keratolytic; concentration determines whether it moisturizes or exfoliates.",
-    pubchemCid: 1176,
+    pubchemCid: 1176,    pubchemCid: 1176,
+
   },
   {
     name: "Lactic Acid",
@@ -539,7 +585,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["pH adjuster", "Skin conditioning"],
     notes:
       "An alpha-hydroxy acid; concentration and pH determine whether it is a moisturizer or exfoliant.",
-    pubchemCid: 612,
+    pubchemCid: 612,    pubchemCid: 612,
+
   },
   {
     name: "Glycolic Acid",
@@ -547,7 +594,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["pH adjuster", "Skin conditioning"],
     notes:
       "The smallest alpha-hydroxy acid; used for exfoliation, dependent on pH and concentration.",
-    pubchemCid: 1031,
+    pubchemCid: 1031,    pubchemCid: 757,
+
   },
   {
     name: "Malic Acid",
@@ -555,7 +603,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["pH adjuster"],
     notes:
       "An alpha-hydroxy acid used to adjust pH.",
-    pubchemCid: 525,
+    pubchemCid: 525,    pubchemCid: 525,
+
   },
   {
     name: "Tartaric Acid",
@@ -563,21 +612,24 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["pH adjuster"],
     notes:
       "An alpha-hydroxy acid used for pH adjustment.",
-    pubchemCid: 875,
+    pubchemCid: 875,    pubchemCid: 875,
+
   },
   {
     name: "Aluminum Chlorohydrate",
     aliases: ["aluminum chlorohydrate", "aluminium chlorohydrate", "ach"],
     functions: ["Deodorant"],
     notes:
-      "An aluminum salt used as an antiperspirant active.",
+      "An aluminum salt used as an antiperspirant active.",    pubchemCid: 71586946,
+
   },
   {
     name: "Aluminum Zirconium Tetrachlorohydrex Gly",
     aliases: ["aluminum zirconium tetrachlorohydrex gly", "azg"],
     functions: ["Deodorant"],
     notes:
-      "An aluminum-zirconium salt used as an antiperspirant active.",
+      "An aluminum-zirconium salt used as an antiperspirant active.",    pubchemCid: 72941670,
+
   },
   {
     name: "Sodium Bicarbonate",
@@ -585,7 +637,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["pH adjuster", "Buffering agent"],
     notes:
       "A mild base used for pH adjustment and deodorizing.",
-    pubchemCid: 516892,
+    pubchemCid: 516892,    pubchemCid: 516892,
+
   },
   {
     name: "Kaolin",
@@ -601,14 +654,16 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Abrasive", "Bulking agent"],
     notes:
       "A magnesium silicate used as an absorbent and bulking agent; regulatory scrutiny of cosmetic talc continues.",
-    pubchemCid: 16211468,
+    pubchemCid: 16211468,    pubchemCid: 165411828,
+
   },
   {
     name: "Mica",
     aliases: ["mica", "potassium aluminum silicate"],
     functions: ["Bulking agent", "Opacifier"],
     notes:
-      "A naturally occurring mineral used for opacity and slip.",
+      "A naturally occurring mineral used for opacity and slip.",    pubchemCid: 131842327,
+
   },
   {
     name: "Titanium Dioxide",
@@ -616,7 +671,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["UV filter", "Opacifier"],
     notes:
       "A mineral UV filter and opacifier; regulatory limits differ between sunscreens and other leave-on products.",
-    pubchemCid: 26042,
+    pubchemCid: 26042,    pubchemCid: 26042,
+
   },
   {
     name: "Zinc Oxide",
@@ -624,14 +680,16 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["UV filter", "Opacifier"],
     notes:
       "A mineral UV filter; broad-spectrum protection depends on particle size and dispersion.",
-    pubchemCid: 14806,
+    pubchemCid: 14806,    pubchemCid: 3007857,
+
   },
   {
     name: "Octinoxate",
     aliases: ["octinoxate", "octyl methoxycinnamate", "ethylhexyl methoxycinnamate"],
     functions: ["UV filter"],
     notes:
-      "An organic UV filter; regulatory approvals and concentration limits vary by region.",
+      "An organic UV filter; regulatory approvals and concentration limits vary by region.",    pubchemCid: 5355130,
+
   },
   {
     name: "Octocrylene",
@@ -639,7 +697,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["UV filter"],
     notes:
       "An organic UV filter that also stabilizes other UV filters; approval status varies.",
-    pubchemCid: 21582,
+    pubchemCid: 21582,    pubchemCid: 22571,
+
   },
   {
     name: "Avobenzone",
@@ -647,14 +706,16 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["UV filter"],
     notes:
       "A broad-spectrum organic UV filter; unstable without co-stabilizers.",
-    pubchemCid: 6310088,
+    pubchemCid: 6310088,    pubchemCid: 51040,
+
   },
   {
     name: "Homosalate",
     aliases: ["homosalate"],
     functions: ["UV filter"],
     notes:
-      "A salicylate UV filter; EU concentration limits have been tightened.",
+      "A salicylate UV filter; EU concentration limits have been tightened.",    pubchemCid: 8362,
+
   },
   {
     name: "Oxybenzone",
@@ -662,7 +723,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["UV filter"],
     notes:
       "An organic UV filter; restricted or banned in some jurisdictions over environmental concerns.",
-    pubchemCid: 4632,
+    pubchemCid: 4632,    pubchemCid: 4632,
+
   },
   {
     name: "Fragrance",
@@ -677,7 +739,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Fragrance"],
     notes:
       "A naturally occurring fragrance compound; a declared EU fragrance allergen.",
-    pubchemCid: 6549,
+    pubchemCid: 6549,    pubchemCid: 6549,
+
   },
   {
     name: "Limonene",
@@ -685,7 +748,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Fragrance"],
     notes:
       "A citrus-scented fragrance compound; a declared EU fragrance allergen.",
-    pubchemCid: 22311,
+    pubchemCid: 22311,    pubchemCid: 22311,
+
   },
   {
     name: "Citronellol",
@@ -693,7 +757,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Fragrance"],
     notes:
       "A floral fragrance compound; a declared EU fragrance allergen.",
-    pubchemCid: 8842,
+    pubchemCid: 8842,    pubchemCid: 8842,
+
   },
   {
     name: "Geraniol",
@@ -701,7 +766,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Fragrance"],
     notes:
       "A rose-like fragrance compound; a declared EU fragrance allergen.",
-    pubchemCid: 637566,
+    pubchemCid: 637566,    pubchemCid: 637566,
+
   },
   {
     name: "Eugenol",
@@ -709,7 +775,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Fragrance"],
     notes:
       "A clove-like fragrance compound; a declared EU fragrance allergen.",
-    pubchemCid: 3314,
+    pubchemCid: 3314,    pubchemCid: 3314,
+
   },
   {
     name: "Coumarin",
@@ -717,7 +784,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Fragrance"],
     notes:
       "A sweet hay-like fragrance compound; a declared EU fragrance allergen.",
-    pubchemCid: 323,
+    pubchemCid: 323,    pubchemCid: 323,
+
   },
   {
     name: "Hexyl Cinnamal",
@@ -725,7 +793,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Fragrance"],
     notes:
       "A floral fragrance compound; a declared EU fragrance allergen.",
-    pubchemCid: 1554019,
+    pubchemCid: 1554019,    pubchemCid: 1715135,
+
   },
   {
     name: "Butylene Glycol",
@@ -733,7 +802,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Humectant", "Solvent"],
     notes:
       "A glycol used as a humectant and penetration enhancer.",
-    pubchemCid: 7893,
+    pubchemCid: 7893,    pubchemCid: 7896,
+
   },
   {
     name: "Propylene Glycol",
@@ -741,7 +811,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Humectant", "Solvent"],
     notes:
       "A glycol used as a humectant and solvent; a common contact sensitizer in some individuals.",
-    pubchemCid: 1030,
+    pubchemCid: 1030,    pubchemCid: 1030,
+
   },
   {
     name: "Pentylene Glycol",
@@ -749,7 +820,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Humectant", "Solvent"],
     notes:
       "A glycol used as a humectant and preservative booster.",
-    pubchemCid: 10934,
+    pubchemCid: 10934,    pubchemCid: 93000,
+
   },
   {
     name: "Dipropylene Glycol",
@@ -757,7 +829,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Solvent", "Humectant"],
     notes:
       "A glycol solvent and fragrance carrier.",
-    pubchemCid: 329,
+    pubchemCid: 329,    pubchemCid: 134692469,
+
   },
   {
     name: "Hydrolyzed Collagen",
@@ -786,7 +859,8 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     functions: ["Skin conditioning"],
     notes:
       "A methylxanthine used for skin conditioning claims.",
-    pubchemCid: 2519,
+    pubchemCid: 2519,    pubchemCid: 2519,
+
   },
   {
     name: "Green Tea Extract",

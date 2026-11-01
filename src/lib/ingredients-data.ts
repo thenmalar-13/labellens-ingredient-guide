@@ -428,6 +428,14 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
     pubchemCid: 6144,
   },
   {
+    name: "Alcohol",
+    aliases: ["alcohol", "ethanol", "ethyl alcohol"],
+    functions: ["Solvent", "Antimicrobial"],
+    notes:
+      "Ethanol used as a solvent and antimicrobial; can be drying at higher concentrations, especially in leave-on products.",
+    pubchemCid: 702,
+  },
+  {
     name: "Alcohol Denat.",
     aliases: [
       "alcohol denat.",
@@ -755,33 +763,42 @@ export const PERSONAL_CARE_INGREDIENTS: IngredientEntry[] = [
 
 const matchIndex = new Map<string, IngredientEntry>();
 for (const entry of PERSONAL_CARE_INGREDIENTS) {
-  matchIndex.set(entry.name.toLowerCase(), entry);
-  for (const alias of entry.aliases) matchIndex.set(alias.toLowerCase(), entry);
+  matchIndex.set(normalizeIngredientName(entry.name), entry);
+  for (const alias of entry.aliases) {
+    const key = normalizeIngredientName(alias);
+    if (key) matchIndex.set(key, entry);
+  }
 }
 
-/** Normalize an ingredient name for matching. */
+/**
+ * Normalize an ingredient name for matching: lowercase, drop parenthetical
+ * qualifiers ("Glycerin (5%)" → "Glycerin"), turn hyphens/dashes and other
+ * punctuation into spaces, collapse whitespace, and trim stray punctuation.
+ * Both the query and the index keys are run through the same function.
+ */
 export function normalizeIngredientName(raw: string): string {
   return raw
     .trim()
     .toLowerCase()
-    .replace(/\(.*?\)/g, "")
-    .replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, "")
+    .replace(/\([^)]*\)/g, " ")
+    .replace(/[-–—]/g, " ")
+    .replace(/[^\p{L}\p{N},]+/gu, " ")
+    .replace(/\s*,\s*/g, ",")
+    .replace(/\s+/g, " ")
     .trim();
 }
 
-/** Look up an ingredient in the curated dataset. Returns undefined if no match. */
+/**
+ * Look up an ingredient in the curated dataset. Returns undefined if no match.
+ *
+ * Matching is exact on the normalized name or a verified alias only. There is
+ * deliberately NO substring/fuzzy fallback: unrestricted contains-matching
+ * produced wrong results ("White Tea Extract" → Triethanolamine via the alias
+ * "tea", "Rose Water" → Aqua via "water", "Alcohol" → Alcohol Denat.). An
+ * unmatched ingredient gets an honest "insufficient evidence" state instead.
+ */
 export function findPersonalCareIngredient(rawName: string): IngredientEntry | undefined {
   const key = normalizeIngredientName(rawName);
   if (!key) return undefined;
-  let entry = matchIndex.get(key);
-  if (!entry) {
-    // Try a contains match for INCI qualifiers like "Sodium Lauroyl Sarcosinate (30%)"
-    for (const alias of matchIndex.keys()) {
-      if (key.includes(alias) || alias.includes(key)) {
-        entry = matchIndex.get(alias);
-        break;
-      }
-    }
-  }
-  return entry;
+  return matchIndex.get(key);
 }

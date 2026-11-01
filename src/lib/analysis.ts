@@ -90,6 +90,49 @@ export async function resolvePubChemCid(name: string): Promise<number | null> {
   }
 }
 
+/**
+ * Check that a PubChem CID actually corresponds to the requested ingredient
+ * before linking to it. Compares the compound's PubChem title against the
+ * ingredient name (normalized: case, hyphens, punctuation, whitespace).
+ * Returns false when identity cannot be verified — no link is attached for
+ * an unverifiable compound.
+ */
+export async function verifyPubChemCid(cid: number, name: string): Promise<boolean> {
+  const url = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${cid}/property/Title/JSON`;
+  try {
+    const res = await fetch(url, {
+      headers: { accept: "application/json" },
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!res.ok) return false;
+    const data = (await res.json()) as { PropertyTable?: { Properties?: { Title?: string }[] } };
+    const title = data?.PropertyTable?.Properties?.[0]?.Title;
+    if (typeof title !== "string" || !title.trim()) return false;
+    const t = normalizeIngredientName(title);
+    const n = normalizeIngredientName(name);
+    if (!t || !n) return false;
+    if (t === n) return true;
+    // Accept the title only when it contains every name token as whole words
+    // and adds at most two qualifier tokens (e.g. isomer/registration notes).
+    const nameTokens = new Set(n.split(" "));
+    const titleTokens = t.split(" ");
+    const allPresent = [...nameTokens].every((tok) => titleTokens.includes(tok));
+    return allPresent && titleTokens.length - nameTokens.size <= 2;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Resolve a CID and only return it when the compound identity is verified.
+ * Returns null on lookup failure, verification failure, or network error.
+ */
+export async function resolveVerifiedPubChemCid(name: string): Promise<number | null> {
+  const cid = await resolvePubChemCid(name);
+  if (cid === null) return null;
+  return (await verifyPubChemCid(cid, name)) ? cid : null;
+}
+
 /** Compose the honest "potential concerns" lines for a matched ingredient. */
 export function concernsFor(entry: IngredientEntry): string[] {
   const concerns: string[] = [];
@@ -106,9 +149,17 @@ export function concernsFor(entry: IngredientEntry): string[] {
     );
   }
   if (f.includes("Fragrance")) {
-    concerns.push(
-      "Fragrance ingredients are among the most common contact allergens. This compound is a declared EU fragrance allergen and must be listed when present above threshold.",
-    );
+    if (entry.name === "Fragrance") {
+      // Generic parfum listing: the blend's compounds are undisclosed, so no
+      // specific allergen can be claimed.
+      concerns.push(
+        "A 'Fragrance/Parfum' listing does not disclose the individual aroma compounds. Whether a specific fragrance allergen is present cannot be determined from the label unless it is separately declared.",
+      );
+    } else {
+      concerns.push(
+        "Fragrance ingredients are among the most common contact allergens. This compound is a declared EU fragrance allergen and must be listed when present above threshold.",
+      );
+    }
   }
   if (f.includes("UV filter")) {
     concerns.push(

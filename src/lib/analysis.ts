@@ -1,5 +1,6 @@
 import {
   findPersonalCareIngredient,
+  normalizeIngredientName,
   type IngredientEntry,
 } from "@/lib/ingredients-data";
 import type { ScanCategory } from "@/lib/scans.functions";
@@ -93,11 +94,17 @@ export async function resolvePubChemCid(name: string): Promise<number | null> {
 /**
  * Check that a PubChem CID actually corresponds to the requested ingredient
  * before linking to it. Compares the compound's PubChem title against the
- * ingredient name (normalized: case, hyphens, punctuation, whitespace).
+ * ingredient name and its verified aliases (normalized: case, hyphens,
+ * punctuation, whitespace) — e.g. "Alcohol" verifies against the title
+ * "Ethanol" because "ethanol" is a verified alias.
  * Returns false when identity cannot be verified — no link is attached for
  * an unverifiable compound.
  */
-export async function verifyPubChemCid(cid: number, name: string): Promise<boolean> {
+export async function verifyPubChemCid(
+  cid: number,
+  name: string,
+  aliases: string[] = [],
+): Promise<boolean> {
   const url = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${cid}/property/Title/JSON`;
   try {
     const res = await fetch(url, {
@@ -109,28 +116,17 @@ export async function verifyPubChemCid(cid: number, name: string): Promise<boole
     const title = data?.PropertyTable?.Properties?.[0]?.Title;
     if (typeof title !== "string" || !title.trim()) return false;
     const t = normalizeIngredientName(title);
-    const n = normalizeIngredientName(name);
-    if (!t || !n) return false;
-    if (t === n) return true;
-    // Accept the title only when it contains every name token as whole words
-    // and adds at most two qualifier tokens (e.g. isomer/registration notes).
-    const nameTokens = new Set(n.split(" "));
+    if (!t) return false;
     const titleTokens = t.split(" ");
-    const allPresent = [...nameTokens].every((tok) => titleTokens.includes(tok));
-    return allPresent && titleTokens.length - nameTokens.size <= 2;
+    const candidates = [name, ...aliases].map((c) => normalizeIngredientName(c)).filter(Boolean);
+    return candidates.some((candidate) => {
+      const tokens = candidate.split(" ");
+      const allPresent = tokens.every((tok) => titleTokens.includes(tok));
+      return allPresent && titleTokens.length - tokens.length <= 2;
+    });
   } catch {
     return false;
   }
-}
-
-/**
- * Resolve a CID and only return it when the compound identity is verified.
- * Returns null on lookup failure, verification failure, or network error.
- */
-export async function resolveVerifiedPubChemCid(name: string): Promise<number | null> {
-  const cid = await resolvePubChemCid(name);
-  if (cid === null) return null;
-  return (await verifyPubChemCid(cid, name)) ? cid : null;
 }
 
 /** Compose the honest "potential concerns" lines for a matched ingredient. */
@@ -253,7 +249,7 @@ export function confidenceFor(entry: IngredientEntry): { confidence: Confidence;
 /** Analyze a single personal-care ingredient. Pure except for the optional PubChem call. */
 export async function analyzePersonalCareIngredient(
   rawName: string,
-  fetchCid: (name: string) => Promise<number | null> = resolveVerifiedPubChemCid,
+  fetchCid: (name: string) => Promise<number | null> = resolvePubChemCid,
 ): Promise<IngredientAnalysis> {
   const entry = findPersonalCareIngredient(rawName);
   const sources: IngredientSource[] = [];

@@ -274,11 +274,16 @@ export async function analyzePersonalCareIngredient(
     };
   }
 
-  // Resolve a CID: prefer the curated one, else ask PubChem and verify the
-  // compound identity before linking to it.
+  // Resolve a CID: prefer the curated one, else ask PubChem. A live-resolved
+  // CID is only linked after its compound identity is verified against the
+  // ingredient name or a verified alias; unverifiable CIDs fall back to a
+  // plain search link.
   let cid: number | null = entry.pubchemCid ?? null;
   if (cid === null) {
     cid = await fetchCid(entry.name);
+    if (cid !== null && !(await verifyPubChemCid(cid, entry.name, entry.aliases))) {
+      cid = null;
+    }
   }
 
   sources.push({ label: "CosIng search", url: cosingSearchUrl(entry.name) });
@@ -310,7 +315,7 @@ export async function analyzePersonalCareIngredient(
 export async function analyzeScan(
   category: ScanCategory,
   ingredients: string[],
-  fetchCid: (name: string) => Promise<number | null> = resolveVerifiedPubChemCid,
+  fetchCid: (name: string) => Promise<number | null> = resolvePubChemCid,
 ): Promise<ScanAnalysis> {
   const cleaned = ingredients.map((s) => s.trim()).filter(Boolean);
 

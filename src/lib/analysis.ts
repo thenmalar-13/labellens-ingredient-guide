@@ -253,7 +253,7 @@ export function confidenceFor(entry: IngredientEntry): { confidence: Confidence;
 /** Analyze a single personal-care ingredient. Pure except for the optional PubChem call. */
 export async function analyzePersonalCareIngredient(
   rawName: string,
-  fetchCid: (name: string) => Promise<number | null> = resolvePubChemCid,
+  fetchCid: (name: string) => Promise<number | null> = resolveVerifiedPubChemCid,
 ): Promise<IngredientAnalysis> {
   const entry = findPersonalCareIngredient(rawName);
   const sources: IngredientSource[] = [];
@@ -278,7 +278,8 @@ export async function analyzePersonalCareIngredient(
     };
   }
 
-  // Resolve a CID: prefer the curated one, else ask PubChem.
+  // Resolve a CID: prefer the curated one, else ask PubChem and verify the
+  // compound identity before linking to it.
   let cid: number | null = entry.pubchemCid ?? null;
   if (cid === null) {
     cid = await fetchCid(entry.name);
@@ -313,7 +314,7 @@ export async function analyzePersonalCareIngredient(
 export async function analyzeScan(
   category: ScanCategory,
   ingredients: string[],
-  fetchCid: (name: string) => Promise<number | null> = resolvePubChemCid,
+  fetchCid: (name: string) => Promise<number | null> = resolveVerifiedPubChemCid,
 ): Promise<ScanAnalysis> {
   const cleaned = ingredients.map((s) => s.trim()).filter(Boolean);
 

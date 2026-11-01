@@ -5,8 +5,13 @@ import {
   cosingSearchUrl,
   pubchemCompoundUrl,
   resolvePubChemCid,
+  resolveVerifiedPubChemCid,
+  verifyPubChemCid,
 } from "@/lib/analysis";
-import { findPersonalCareIngredient } from "@/lib/ingredients-data";
+import {
+  findPersonalCareIngredient,
+  normalizeIngredientName,
+} from "@/lib/ingredients-data";
 
 /** Stub the global fetch used by resolvePubChemCid. */
 function stubFetch(impl: () => Promise<Response>) {
@@ -31,8 +36,151 @@ describe("ingredient matching", () => {
     expect(findPersonalCareIngredient("glycerine")?.name).toBe("Glycerin");
   });
 
-  it("matches INCI qualifiers like concentrations via a contains match", () => {
+  it("matches INCI qualifiers by stripping parenthetical qualifiers", () => {
     expect(findPersonalCareIngredient("Glycerin (5%)")?.name).toBe("Glycerin");
+  });
+});
+
+describe("matcher regressions — no substring false matches", () => {
+  it("does not match White Tea Extract to Triethanolamine via the alias 'tea'", () => {
+    expect(findPersonalCareIngredient("White Tea Extract")).toBeUndefined();
+    expect(findPersonalCareIngredient("White Tea Extract")?.name).not.toBe("Triethanolamine");
+  });
+
+  it("does not match Rose Water to Aqua via the alias 'water'", () => {
+    expect(findPersonalCareIngredient("Rose Water")).toBeUndefined();
+  });
+
+  it("does not match bare Alcohol to Alcohol Denat. or other alcohol ingredients", () => {
+    expect(findPersonalCareIngredient("Alcohol")?.name).toBe("Alcohol");
+    expect(findPersonalCareIngredient("Alcohol Denat.")?.name).toBe("Alcohol Denat.");
+    expect(findPersonalCareIngredient("Benzyl Alcohol")?.name).toBe("Benzyl Alcohol");
+  });
+
+  it("normalizes hyphens and punctuation consistently on both sides", () => {
+    expect(normalizeIngredientName("Coco-Glucoside")).toBe("coco glucoside");
+    expect(findPersonalCareIngredient("coco glucoside")?.name).toBe("Coco-Glucoside");
+    expect(findPersonalCareIngredient("Coco–Glucoside")?.name).toBe("Coco-Glucoside");
+  });
+
+  it("still matches exact names and verified aliases", () => {
+    expect(findPersonalCareIngredient("Triethanolamine")?.name).toBe("Triethanolamine");
+    expect(findPersonalCareIngredient("parfum")?.name).toBe("Fragrance");
+    expect(findPersonalCareIngredient("SD Alcohol")?.name).toBe("Alcohol Denat.");
+  });
+
+  it("never matches an unknown name to any entry", () => {
+    for (const name of ["Herbal Essence Blend", "Rosehip Oil", "Zzq fictional compound"]) {
+      expect(findPersonalCareIngredient(name)).toBeUndefined();
+    }
+  });
+});
+
+describe("PubChem source relevance — verify before linking", () => {
+  it("accepts a CID whose PubChem title matches the ingredient name", async () => {
+    stubFetch(() =>
+      Promise.resolve(
+        new Response(
+          JSON.stringify({ PropertyTable: { Properties: [{ CID: 702, Title: "Ethanol" }] } }),
+          { status: 200 },
+        ),
+      ),
+    );
+    await expect(verifyPubChemCid(702, "Alcohol")).resolves.toBe(true);
+    await expect(verifyPubChemCid(702, "Ethanol")).resolves.toBe(true);
+  });
+
+  it("rejects a CID whose compound is a different substance", async () => {
+    stubFetch(() =>
+      Promise.resolve(
+        new Response(
+          JSON.stringify({ PropertyTable: { Properties: [{ CID: 2231, Title: "Glucose" }] } }),
+          { status: 200 },
+        ),
+      ),
+    );
+    await expect(verifyPubChemCid(2231, "Alcohol")).resolves.toBe(false);
+  });
+
+  it("returns false on HTTP error, bad payload, or network failure — never an unverifiable link", async () => {
+    stubFetch(() => Promise.resolve(new Response("{}", { status: 404 })));
+    await expect(verifyPubChemCid(702, "Alcohol")).resolves.toBe(false);
+
+    stubFetch(() =>
+      Promise.resolve(new Response(JSON.stringify({ PropertyTable: {} }), { status: 200 })),
+    );
+    await expect(verifyPubChemCid(702, "Alcohol")).resolves.toBe(false);
+
+    stubFetch(() => Promise.reject(new Error("offline")));
+    await expect(verifyPubChemCid(702, "Alcohol")).resolves.toBe(false);
+  });
+
+  it("resolveVerifiedPubChemCid returns null when the resolved compound does not match", async () => {
+    const fetchMock = vi.fn();
+    // Call 1: CID lookup succeeds. Call 2: title belongs to another compound.
+    fetchMock.mockImplementationOnce(() =>
+      Promise.resolve(
+        new Response(JSON.stringify({ IdentifierList: { CID: [2231] } }), { status: 200 }),
+      ),
+    );
+    fetchMock.mockImplementationOnce(() =>
+      Promise.resolve(
+        new Response(
+          JSON.stringify({ PropertyTable: { Properties: [{ CID: 2231, Title: "Glucose" }] } }),
+          { status: 200 },
+        ),
+      ),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    await expect(resolveVerifiedPubChemCid("Alcohol")).resolves.toBeNull();
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it("resolveVerifiedPubChemCid returns the CID when lookup and verification both succeed", async () => {
+    const fetchMock = vi.fn();
+    fetchMock.mockImplementationOnce(() =>
+      Promise.resolve(
+        new Response(JSON.stringify({ IdentifierList: { CID: [702] } }), { status: 200 }),
+      ),
+    );
+    fetchMock.mockImplementationOnce(() =>
+      Promise.resolve(
+        new Response(
+          JSON.stringify({ PropertyTable: { Properties: [{ CID: 702, Title: "Ethanol" }] } }),
+          { status: 200 },
+        ),
+      ),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    await expect(resolveVerifiedPubChemCid("Alcohol")).resolves.toBe(702);
+  });
+
+  it("matched ingredients link only to their own compound page", async () => {
+    stubFetch(() => Promise.reject(new Error("offline")));
+    const linalool = await analyzePersonalCareIngredient("Linalool");
+    expect(linalool.matched).toBe(true);
+    expect(linalool.sources.map((s) => s.url)).toContain(pubchemCompoundUrl(6549));
+    // No live lookup was attempted, so no unverified compound link can appear.
+    expect(linalool.sources.every((s) => s.url.startsWith("https://"))).toBe(true);
+  });
+});
+
+describe("generic Fragrance (parfum) vs declared allergens", () => {
+  it("does not claim a generic Fragrance listing is a declared EU fragrance allergen", async () => {
+    stubFetch(() => Promise.reject(new Error("offline")));
+    const parfum = await analyzePersonalCareIngredient("Parfum");
+    expect(parfum.matched).toBe(true);
+    expect(parfum.name).toBe("Fragrance");
+    const joined = parfum.potentialConcerns.join(" ");
+    expect(joined).not.toMatch(/declared EU fragrance allergen/i);
+    expect(joined).toMatch(/not disclose/i);
+  });
+
+  it("keeps the declared-allergen wording for named fragrance compounds", async () => {
+    stubFetch(() => Promise.reject(new Error("offline")));
+    const linalool = await analyzePersonalCareIngredient("Linalool");
+    expect(linalool.matched).toBe(true);
+    expect(linalool.potentialConcerns.join(" ")).toMatch(/declared EU fragrance allergen/i);
   });
 });
 
@@ -111,8 +259,8 @@ describe("PubChem enrichment with graceful fallback", () => {
 
   it("falls back to a PubChem search link when enrichment fails, and analysis still completes", async () => {
     stubFetch(() => Promise.reject(new Error("offline")));
-    // "Cetearyl Alcohol" has no curated CID; a failed live lookup leaves a search link.
-    const result = await analyzePersonalCareIngredient("Cetearyl Alcohol");
+    // "Aloe Vera" has no curated CID; a failed live lookup leaves a search link.
+    const result = await analyzePersonalCareIngredient("Aloe Vera");
     expect(result.matched).toBe(true);
     expect(result.sources.some((s) => s.url.includes("#query="))).toBe(true);
   });

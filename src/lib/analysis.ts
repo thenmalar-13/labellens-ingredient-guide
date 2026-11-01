@@ -1,5 +1,6 @@
 import {
   findPersonalCareIngredient,
+  normalizeIngredientName,
   type IngredientEntry,
 } from "@/lib/ingredients-data";
 import type { ScanCategory } from "@/lib/scans.functions";
@@ -90,6 +91,44 @@ export async function resolvePubChemCid(name: string): Promise<number | null> {
   }
 }
 
+/**
+ * Check that a PubChem CID actually corresponds to the requested ingredient
+ * before linking to it. Compares the compound's PubChem title against the
+ * ingredient name and its verified aliases (normalized: case, hyphens,
+ * punctuation, whitespace) — e.g. "Alcohol" verifies against the title
+ * "Ethanol" because "ethanol" is a verified alias.
+ * Returns false when identity cannot be verified — no link is attached for
+ * an unverifiable compound.
+ */
+export async function verifyPubChemCid(
+  cid: number,
+  name: string,
+  aliases: string[] = [],
+): Promise<boolean> {
+  const url = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${cid}/property/Title/JSON`;
+  try {
+    const res = await fetch(url, {
+      headers: { accept: "application/json" },
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!res.ok) return false;
+    const data = (await res.json()) as { PropertyTable?: { Properties?: { Title?: string }[] } };
+    const title = data?.PropertyTable?.Properties?.[0]?.Title;
+    if (typeof title !== "string" || !title.trim()) return false;
+    const t = normalizeIngredientName(title);
+    if (!t) return false;
+    const titleTokens = t.split(" ");
+    const candidates = [name, ...aliases].map((c) => normalizeIngredientName(c)).filter(Boolean);
+    return candidates.some((candidate) => {
+      const tokens = candidate.split(" ");
+      const allPresent = tokens.every((tok) => titleTokens.includes(tok));
+      return allPresent && titleTokens.length - tokens.length <= 2;
+    });
+  } catch {
+    return false;
+  }
+}
+
 /** Compose the honest "potential concerns" lines for a matched ingredient. */
 export function concernsFor(entry: IngredientEntry): string[] {
   const concerns: string[] = [];
@@ -106,9 +145,17 @@ export function concernsFor(entry: IngredientEntry): string[] {
     );
   }
   if (f.includes("Fragrance")) {
-    concerns.push(
-      "Fragrance ingredients are among the most common contact allergens. This compound is a declared EU fragrance allergen and must be listed when present above threshold.",
-    );
+    if (entry.name === "Fragrance") {
+      // Generic parfum listing: the blend's compounds are undisclosed, so no
+      // specific allergen can be claimed.
+      concerns.push(
+        "A 'Fragrance/Parfum' listing does not disclose the individual aroma compounds. Whether a specific fragrance allergen is present cannot be determined from the label unless it is separately declared.",
+      );
+    } else {
+      concerns.push(
+        "Fragrance ingredients are among the most common contact allergens. This compound is a declared EU fragrance allergen and must be listed when present above threshold.",
+      );
+    }
   }
   if (f.includes("UV filter")) {
     concerns.push(
@@ -227,7 +274,8 @@ export async function analyzePersonalCareIngredient(
     };
   }
 
-  // Resolve a CID: prefer the curated one, else ask PubChem.
+  // Resolve a CID: prefer the curated one, else ask PubChem and verify the
+  // compound identity before linking to it.
   let cid: number | null = entry.pubchemCid ?? null;
   if (cid === null) {
     cid = await fetchCid(entry.name);
@@ -262,7 +310,7 @@ export async function analyzePersonalCareIngredient(
 export async function analyzeScan(
   category: ScanCategory,
   ingredients: string[],
-  fetchCid: (name: string) => Promise<number | null> = resolvePubChemCid,
+  fetchCid: (name: string) => Promise<number | null> = resolveVerifiedPubChemCid,
 ): Promise<ScanAnalysis> {
   const cleaned = ingredients.map((s) => s.trim()).filter(Boolean);
 

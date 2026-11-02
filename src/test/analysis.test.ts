@@ -5,7 +5,6 @@ import {
   cosingSearchUrl,
   pubchemCompoundUrl,
   resolvePubChemCid,
-  resolveVerifiedPubChemCid,
   verifyPubChemCid,
 } from "@/lib/analysis";
 import {
@@ -77,7 +76,7 @@ describe("matcher regressions — no substring false matches", () => {
 });
 
 describe("PubChem source relevance — verify before linking", () => {
-  it("accepts a CID whose PubChem title matches the ingredient name", async () => {
+  it("accepts a CID whose PubChem title matches the ingredient name or a verified alias", async () => {
     stubFetch(() =>
       Promise.resolve(
         new Response(
@@ -86,8 +85,24 @@ describe("PubChem source relevance — verify before linking", () => {
         ),
       ),
     );
-    await expect(verifyPubChemCid(702, "Alcohol")).resolves.toBe(true);
+    // "Alcohol" has no direct title match, but "ethanol" is a verified alias.
+    await expect(
+      verifyPubChemCid(702, "Alcohol", ["alcohol", "ethanol", "ethyl alcohol"]),
+    ).resolves.toBe(true);
     await expect(verifyPubChemCid(702, "Ethanol")).resolves.toBe(true);
+  });
+
+  it("rejects a CID whose title matches neither the name nor any alias", async () => {
+    stubFetch(() =>
+      Promise.resolve(
+        new Response(
+          JSON.stringify({ PropertyTable: { Properties: [{ CID: 702, Title: "Ethanol" }] } }),
+          { status: 200 },
+        ),
+      ),
+    );
+    // Without the alias list, "Alcohol" cannot be verified against "Ethanol".
+    await expect(verifyPubChemCid(702, "Alcohol")).resolves.toBe(false);
   });
 
   it("rejects a CID whose compound is a different substance", async () => {
@@ -115,15 +130,24 @@ describe("PubChem source relevance — verify before linking", () => {
     await expect(verifyPubChemCid(702, "Alcohol")).resolves.toBe(false);
   });
 
-  it("resolveVerifiedPubChemCid returns null when the resolved compound does not match", async () => {
-    const fetchMock = vi.fn();
-    // Call 1: CID lookup succeeds. Call 2: title belongs to another compound.
-    fetchMock.mockImplementationOnce(() =>
+  it("links a live-resolved compound only after its title verifies against a name or alias", async () => {
+    stubFetch(() =>
       Promise.resolve(
-        new Response(JSON.stringify({ IdentifierList: { CID: [2231] } }), { status: 200 }),
+        new Response(
+          JSON.stringify({ PropertyTable: { Properties: [{ CID: 305, Title: "Aloe" }] } }),
+          { status: 200 },
+        ),
       ),
     );
-    fetchMock.mockImplementationOnce(() =>
+    // "Aloe Vera" has no curated CID; the live CID is kept because the title
+    // "Aloe" verifies through the entry's alias list.
+    const result = await analyzePersonalCareIngredient("Aloe Vera", async () => 305);
+    expect(result.matched).toBe(true);
+    expect(result.sources.some((s) => s.url === pubchemCompoundUrl(305))).toBe(true);
+  });
+
+  it("falls back to a search link when the live-resolved compound does not verify", async () => {
+    stubFetch(() =>
       Promise.resolve(
         new Response(
           JSON.stringify({ PropertyTable: { Properties: [{ CID: 2231, Title: "Glucose" }] } }),
@@ -131,28 +155,11 @@ describe("PubChem source relevance — verify before linking", () => {
         ),
       ),
     );
-    vi.stubGlobal("fetch", fetchMock);
-    await expect(resolveVerifiedPubChemCid("Alcohol")).resolves.toBeNull();
-    expect(fetchMock).toHaveBeenCalledTimes(2);
-  });
-
-  it("resolveVerifiedPubChemCid returns the CID when lookup and verification both succeed", async () => {
-    const fetchMock = vi.fn();
-    fetchMock.mockImplementationOnce(() =>
-      Promise.resolve(
-        new Response(JSON.stringify({ IdentifierList: { CID: [702] } }), { status: 200 }),
-      ),
-    );
-    fetchMock.mockImplementationOnce(() =>
-      Promise.resolve(
-        new Response(
-          JSON.stringify({ PropertyTable: { Properties: [{ CID: 702, Title: "Ethanol" }] } }),
-          { status: 200 },
-        ),
-      ),
-    );
-    vi.stubGlobal("fetch", fetchMock);
-    await expect(resolveVerifiedPubChemCid("Alcohol")).resolves.toBe(702);
+    const result = await analyzePersonalCareIngredient("Aloe Vera", async () => 2231);
+    expect(result.matched).toBe(true);
+    // No unrelated compound page is ever attached.
+    expect(result.sources.some((s) => s.url === pubchemCompoundUrl(2231))).toBe(false);
+    expect(result.sources.some((s) => s.url.includes("#query="))).toBe(true);
   });
 
   it("matched ingredients link only to their own compound page", async () => {

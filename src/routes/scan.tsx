@@ -33,8 +33,32 @@ function ScanPage() {
   function handleFile(file?: File) {
     setError(null);
     if (!file) return;
-    if (!file.type.startsWith("image/")) return setError("Please choose an image file, such as a JPEG or PNG.");
-    if (file.size > MAX_MB * 1024 * 1024) return setError(`Image must be under ${MAX_MB} MB.`);
+    const clearExisting = () => {
+      requestRef.current += 1;
+      setRecognizing(false);
+      if (draft.imagePreview) URL.revokeObjectURL(draft.imagePreview);
+    };
+    if (!file.type.startsWith("image/")) {
+      const message = "Please choose a valid image file, such as a JPEG or PNG. You can enter the ingredients manually instead.";
+      clearExisting();
+      setError(message);
+      setDraft({ source: "photo", imageName: null, imagePreview: null, imageFile: null, ocrText: "", ocrConfidence: null, ocrError: message, ingredients: [] });
+      return;
+    }
+    if (file.size === 0) {
+      const message = "This image file is empty or invalid. Choose another image or enter the ingredients manually.";
+      clearExisting();
+      setError(message);
+      setDraft({ source: "photo", imageName: null, imagePreview: null, imageFile: null, ocrText: "", ocrConfidence: null, ocrError: message, ingredients: [] });
+      return;
+    }
+    if (file.size > MAX_MB * 1024 * 1024) {
+      const message = `Image must be under ${MAX_MB} MB. Choose a smaller image or enter the ingredients manually.`;
+      clearExisting();
+      setError(message);
+      setDraft({ source: "photo", imageName: null, imagePreview: null, imageFile: null, ocrText: "", ocrConfidence: null, ocrError: message, ingredients: [] });
+      return;
+    }
     if (draft.imagePreview) URL.revokeObjectURL(draft.imagePreview);
     const requestId = ++requestRef.current;
     setRecognizing(true);
@@ -87,7 +111,7 @@ function ScanPage() {
               requestRef.current += 1;
               setRecognizing(false);
               setError(null);
-              URL.revokeObjectURL(draft.imagePreview ?? "");
+              if (draft.imagePreview) URL.revokeObjectURL(draft.imagePreview);
               setDraft({ imagePreview: null, imageName: null, imageFile: null, ocrText: null, ocrConfidence: null, ocrError: null, ingredients: [] });
             }}>
               <X className="h-4 w-4" aria-hidden /> Remove
@@ -135,8 +159,9 @@ function ScanPage() {
       )}
 
       <div className="mt-8 flex justify-end">
-        <button type="button" disabled={!draft.imagePreview || recognizing} className={btnPrimary} onClick={() => {
-          if (!draft.imageFile) return;
+        <button type="button" disabled={recognizing || (!draft.imagePreview && !draft.ocrError)} className={btnPrimary} onClick={() => {
+          if (!draft.imageFile && !draft.ocrError) return;
+          if (!draft.imageFile) setDraft({ source: "photo", ocrText: "", ingredients: [] });
           navigate({ to: "/review" });
         }}>
           {recognizing ? "Reading label…" : draft.ocrError ? "Enter ingredients manually" : "Continue to review"}

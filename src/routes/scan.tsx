@@ -1,9 +1,9 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useRef, useState, type DragEvent } from "react";
 import { Camera, ImageUp, X } from "lucide-react";
-import { CategoryToggle, Page, Steps, btnGhost, btnPrimary } from "@/components/site";
+import { CategoryToggle, Page, Steps, btnGhost, btnPrimary, cn } from "@/components/site";
 import { setDraft, useDraft } from "@/lib/scan-store";
-import { cn } from "@/lib/utils";
+import { recognizeIngredientLabel } from "@/lib/ocr";
 
 export const Route = createFileRoute("/scan")({
   head: () => ({
@@ -24,16 +24,44 @@ function ScanPage() {
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
   const cameraRef = useRef<HTMLInputElement>(null);
+  const requestRef = useRef(0);
   const [dragging, setDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [recognizing, setRecognizing] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   function handleFile(file?: File) {
     setError(null);
     if (!file) return;
-    if (!file.type.startsWith("image/")) return setError("Please choose an image file (JPG, PNG, HEIC).");
+    if (!file.type.startsWith("image/")) return setError("Please choose an image file, such as a JPEG or PNG.");
     if (file.size > MAX_MB * 1024 * 1024) return setError(`Image must be under ${MAX_MB} MB.`);
     if (draft.imagePreview) URL.revokeObjectURL(draft.imagePreview);
-    setDraft({ source: "photo", imageName: file.name, imagePreview: URL.createObjectURL(file) });
+    const requestId = ++requestRef.current;
+    setRecognizing(true);
+    setProgress(0);
+    setDraft({
+      source: "photo",
+      imageName: file.name,
+      imagePreview: URL.createObjectURL(file),
+      imageFile: file,
+      ocrText: null,
+      ocrConfidence: null,
+      ocrError: null,
+      ingredients: [],
+    });
+    void recognizeIngredientLabel(file, (value) => {
+      if (requestId === requestRef.current) setProgress(value);
+    }).then((result) => {
+      if (requestId !== requestRef.current) return;
+      setDraft({ ocrText: result.text, ingredients: result.ingredients, ocrConfidence: result.confidence, ocrError: null });
+    }).catch((cause: unknown) => {
+      if (requestId !== requestRef.current) return;
+      const message = cause instanceof Error ? cause.message : "The photo could not be read. Enter the ingredients manually.";
+      setError(message);
+      setDraft({ ocrText: "", ocrConfidence: null, ocrError: message, ingredients: [] });
+    }).finally(() => {
+      if (requestId === requestRef.current) setRecognizing(false);
+    });
   }
 
   function onDrop(e: DragEvent) {
@@ -55,7 +83,13 @@ function ScanPage() {
           <img src={draft.imagePreview} alt="Selected label" className="max-h-[420px] w-full object-contain bg-secondary" />
           <div className="flex items-center justify-between gap-3 p-4">
             <p className="truncate text-sm text-muted-foreground">{draft.imageName}</p>
-            <button type="button" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground" onClick={() => setDraft({ imagePreview: null, imageName: null })}>
+            <button type="button" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground" onClick={() => {
+              requestRef.current += 1;
+              setRecognizing(false);
+              setError(null);
+              URL.revokeObjectURL(draft.imagePreview ?? "");
+              setDraft({ imagePreview: null, imageName: null, imageFile: null, ocrText: null, ocrConfidence: null, ocrError: null, ingredients: [] });
+            }}>
               <X className="h-4 w-4" aria-hidden /> Remove
             </button>
           </div>
@@ -86,10 +120,26 @@ function ScanPage() {
         </div>
       )}
       {error && <p role="alert" className="mt-3 text-sm text-destructive">{error}</p>}
+      {recognizing && (
+        <div className="mt-4" aria-live="polite" aria-label="Reading label text">
+          <div className="mb-2 flex justify-between text-sm text-muted-foreground">
+            <span>Reading label on this device…</span><span>{Math.round(progress * 100)}%</span>
+          </div>
+          <div className="h-2 overflow-hidden rounded-full bg-muted">
+            <div className="h-full rounded-full bg-primary transition-[width]" style={{ width: `${Math.round(progress * 100)}%` }} />
+          </div>
+        </div>
+      )}
+      {!recognizing && draft.ocrText !== null && !error && (
+        <p className="mt-4 text-sm text-muted-foreground" role="status">Text read locally. You can review and correct every ingredient before analysis.</p>
+      )}
 
       <div className="mt-8 flex justify-end">
-        <button type="button" disabled={!draft.imagePreview} className={btnPrimary} onClick={() => { setDraft({ ingredients: [] }); navigate({ to: "/review" }); }}>
-          Continue to review
+        <button type="button" disabled={!draft.imagePreview || recognizing} className={btnPrimary} onClick={() => {
+          if (!draft.imageFile) return;
+          navigate({ to: "/review" });
+        }}>
+          {recognizing ? "Reading label…" : draft.ocrError ? "Enter ingredients manually" : "Continue to review"}
         </button>
       </div>
     </Page>

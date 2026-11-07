@@ -7,6 +7,10 @@ export interface ScanDraft {
   category: Category;
   imageName: string | null;
   imagePreview: string | null;
+  imageFile: File | null;
+  ocrText: string | null;
+  ocrConfidence: number | null;
+  ocrError: string | null;
   ingredients: string[];
   /** Saved analysis restored from history, used to avoid re-running on reopen. */
   savedResults: import("@/lib/analysis").ScanAnalysis | null;
@@ -17,6 +21,10 @@ const initial: ScanDraft = {
   category: "food",
   imageName: null,
   imagePreview: null,
+  imageFile: null,
+  ocrText: null,
+  ocrConfidence: null,
+  ocrError: null,
   ingredients: [],
   savedResults: null,
 };

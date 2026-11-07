@@ -1,3 +1,3 @@
-- [ ] Add local browser OCR to photo scan and preserve manual review/fallback.
+- [x] Add local browser OCR to photo scan and preserve manual review/fallback.
 - [ ] Verify full scan workflow, auth/history behavior, and existing ownership protections safely.
 - [ ] Run full tests, typecheck, production build, and report actual results/limitations.

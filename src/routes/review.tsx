@@ -47,10 +47,27 @@ function ReviewPage() {
       <div className="grid gap-8 md:grid-cols-[1fr_220px]">
         <div>
           {draft.source === "photo" && (
-            <div className="mb-6">
+            <div className="mb-6 space-y-4">
               <Notice>
-                Automatic text reading from photos isn't connected yet. Please type the ingredients from your photo below.
+                {draft.ocrError
+                  ? `${draft.ocrError} You can enter the ingredient text below.`
+                  : "Text was read on this device. OCR can make mistakes; check and correct the ingredient text before continuing."}
               </Notice>
+              {draft.ocrConfidence !== null && draft.ocrConfidence < 60 && (
+                <p className="text-sm text-warning-foreground" role="status">The photo text may be unclear ({Math.round(draft.ocrConfidence)}% recognition confidence). Please verify it against the label.</p>
+              )}
+              <label htmlFor="recognized-text" className="block text-sm font-medium text-foreground">Recognized text — edit or enter manually</label>
+              <textarea
+                id="recognized-text"
+                rows={5}
+                value={draft.ocrText ?? ""}
+                onChange={(event) => {
+                  const text = event.target.value;
+                  setDraft({ ocrText: text, ingredients: parseIngredients(text), ocrConfidence: null, ocrError: null });
+                }}
+                placeholder="Enter the ingredient list, separated by commas or new lines"
+                className={inputCls}
+              />
             </div>
           )}
           <ul className="space-y-2" aria-label="Ingredients">

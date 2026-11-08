@@ -1,7 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useRef, useState, type DragEvent } from "react";
 import { Camera, ImageUp, X } from "lucide-react";
-import { CategoryToggle, Page, Steps, btnGhost, btnPrimary, cn } from "@/components/site";
+import { CategoryToggle, Page, Steps, btnGhost, btnPrimary } from "@/components/site";
+import { cn } from "@/lib/utils";
 import { setDraft, useDraft } from "@/lib/scan-store";
 import { recognizeIngredientLabel } from "@/lib/ocr";
 

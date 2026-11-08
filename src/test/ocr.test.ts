@@ -1,6 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createWorker } from "tesseract.js";
 import { OcrError, recognizeIngredientLabel } from "@/lib/ocr";
+import { analyzeScan } from "@/lib/analysis";
+import { parseIngredients } from "@/lib/scan-store";
 
 vi.mock("tesseract.js", () => ({ createWorker: vi.fn() }));
 
@@ -64,5 +66,21 @@ describe("local label OCR", () => {
     mockedCreateWorker.mockResolvedValue(worker as never);
     await expect(recognizeIngredientLabel(new File(["image"], "label.png", { type: "image/png" }))).rejects.toMatchObject({ kind: "recognition-failed" });
     expect(worker.terminate).toHaveBeenCalledOnce();
+  });
+
+  it("analyzes only the ingredient text approved after photo review", async () => {
+    makeWorker("Ingredients: Water, Glycerin, Sodium Chloride");
+    const extracted = await recognizeIngredientLabel(
+      new File(["image"], "label.png", { type: "image/png" }),
+    );
+
+    // Simulate the editable review textarea: the user corrects the OCR text before continuing.
+    const approvedIngredients = parseIngredients("Aqua, Glycerin");
+    expect(extracted.ingredients).toEqual(["Water", "Glycerin", "Sodium Chloride"]);
+
+    const result = await analyzeScan("personal-care", approvedIngredients, async () => null);
+    expect(result.category).toBe("personal-care");
+    expect(result.ingredients.map((ingredient) => ingredient.name)).toEqual(["Aqua", "Glycerin"]);
+    expect(result.ingredients.every((ingredient) => ingredient.name !== "Sodium Chloride")).toBe(true);
   });
 });

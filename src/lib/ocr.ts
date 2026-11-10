@@ -1,4 +1,4 @@
-import { parseIngredients } from "@/lib/scan-store";
+import { extractIngredientSection, parseOcrIngredients } from "@/lib/scan-store";
 
 export type OcrFailureKind = "invalid-image" | "unsupported-image" | "unreadable" | "recognition-failed";
 
@@ -16,6 +16,7 @@ export interface IngredientOcrResult {
   text: string;
   ingredients: string[];
   confidence: number;
+  uncertainSegments: string[];
 }
 
 /** Read a browser-decodable image locally and return text for the user to review. */
@@ -53,15 +54,28 @@ export async function recognizeIngredientLabel(
     });
     try {
       const { data } = await worker.recognize(file);
-      const text = data.text.trim();
-      const ingredients = parseIngredients(text);
+      const text = extractIngredientSection(data.text);
+      if (text === null) {
+        throw new OcrError(
+          "unreadable",
+          "No clear INGREDIENTS heading was found. Try a sharper photo or enter the ingredients manually.",
+        );
+      }
+      const ingredients = parseOcrIngredients(text);
       if (ingredients.length === 0) {
         throw new OcrError(
           "unreadable",
           "No clear ingredient text was found. Try a sharper, well-lit photo or enter the ingredients manually.",
         );
       }
-      return { text, ingredients, confidence: data.confidence };
+      const sectionWords = new Set(text.toLocaleLowerCase().match(/[\p{L}\p{N}]+/gu) ?? []);
+      const uncertainSegments = [...new Set(
+        (data.words ?? [])
+          .filter((word) => word.confidence < 55)
+          .map((word) => word.text.trim())
+          .filter((word) => word && (word.toLocaleLowerCase().match(/[\p{L}\p{N}]+/gu) ?? []).some((token) => sectionWords.has(token))),
+      )];
+      return { text, ingredients, confidence: data.confidence, uncertainSegments };
     } finally {
       await worker.terminate().catch(() => undefined);
     }

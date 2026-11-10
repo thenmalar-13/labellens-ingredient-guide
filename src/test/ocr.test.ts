@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createWorker } from "tesseract.js";
 import { OcrError, recognizeIngredientLabel } from "@/lib/ocr";
 import { analyzeScan } from "@/lib/analysis";
-import { parseIngredients } from "@/lib/scan-store";
+import { extractIngredientSection, parseIngredients, parseOcrIngredients } from "@/lib/scan-store";
 
 vi.mock("tesseract.js", () => ({ createWorker: vi.fn() }));
 
@@ -10,7 +10,7 @@ const mockedCreateWorker = vi.mocked(createWorker);
 
 function makeWorker(text: string, confidence = 86) {
   const worker = {
-    recognize: vi.fn().mockResolvedValue({ data: { text, confidence } }),
+    recognize: vi.fn().mockResolvedValue({ data: { text, confidence, words: [] } }),
     terminate: vi.fn().mockResolvedValue(undefined),
   };
   mockedCreateWorker.mockResolvedValue(worker as never);
@@ -32,9 +32,10 @@ describe("local label OCR", () => {
     const progress = vi.fn();
     const result = await recognizeIngredientLabel(new File(["image"], "label.png", { type: "image/png" }), progress);
 
-    expect(result.text).toBe("Ingredients: Aqua, Glycerin\nSodium Chloride");
+    expect(result.text).toBe("Aqua, Glycerin Sodium Chloride");
     expect(result.ingredients).toEqual(["Aqua", "Glycerin", "Sodium Chloride"]);
     expect(result.confidence).toBe(92);
+    expect(result.uncertainSegments).toEqual([]);
     expect(worker.recognize).toHaveBeenCalledWith(expect.any(File));
     expect(worker.terminate).toHaveBeenCalledOnce();
   });
@@ -48,6 +49,47 @@ describe("local label OCR", () => {
   it("returns a manual-entry unreadable state when OCR finds no text", async () => {
     makeWorker("   \n ");
     await expect(recognizeIngredientLabel(new File(["image"], "blur.png", { type: "image/png" }))).rejects.toMatchObject({ kind: "unreadable" });
+  });
+
+  it("extracts only the ingredient section and stops at packaging headings", () => {
+    const text = `Moisturizing balm\nINGREDIENTS: Microcrystalline Wax, Caprylic/Capric\nTriglyceride, Kokum Butter, Olive Oil (including Olea Europaea)\nDIRECTIONS: Apply as needed\nWarnings: For external use only\nBest before: 2027`;
+    expect(extractIngredientSection(text)).toBe(
+      "Microcrystalline Wax, Caprylic/Capric Triglyceride, Kokum Butter, Olive Oil (including Olea Europaea)",
+    );
+    expect(parseOcrIngredients(text)).toEqual([
+      "Microcrystalline Wax",
+      "Caprylic/Capric Triglyceride",
+      "Kokum Butter",
+      "Olive Oil (including Olea Europaea)",
+    ]);
+  });
+
+  it("preserves grouped expressions, line-wrapped names, and uncertain spelling without autocorrection", () => {
+    expect(parseOcrIngredients("INGREDIENTS: C12-15 Alkyl Benzoate\n(and) Hydrogenated Olive Oil (A, B), Sillicone Oyl"))
+      .toEqual(["C12-15 Alkyl Benzoate (and) Hydrogenated Olive Oil (A, B)", "Sillicone Oyl"]);
+  });
+
+  it("reports low-confidence words from the ingredient section for user review", async () => {
+    const worker = makeWorker("INGREDIENTS: Aqua, Glycerin\nDirections: apply daily");
+    worker.recognize.mockResolvedValue({
+      data: {
+        text: "INGREDIENTS: Aqua, Glycerin\nDirections: apply daily",
+        confidence: 80,
+        words: [
+          { text: "Aqua", confidence: 96 },
+          { text: "Glycerin", confidence: 31 },
+          { text: "Directions", confidence: 20 },
+        ],
+      },
+    } as never);
+    const result = await recognizeIngredientLabel(new File(["image"], "label.png", { type: "image/png" }));
+    expect(result.uncertainSegments).toEqual(["Glycerin"]);
+  });
+
+  it("does not guess when OCR lacks an ingredients heading", async () => {
+    makeWorker("Moisturizing balm. For external use only. Apply as needed.");
+    await expect(recognizeIngredientLabel(new File(["image"], "label.png", { type: "image/png" })))
+      .rejects.toMatchObject({ kind: "unreadable" });
   });
 
   it("reports unsupported browser image decoding without calling OCR", async () => {

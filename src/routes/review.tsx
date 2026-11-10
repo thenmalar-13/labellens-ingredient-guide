@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { GripVertical, Plus, Trash2 } from "lucide-react";
 import { CategoryToggle, Notice, Page, Steps, btnGhost, btnPrimary, inputCls } from "@/components/site";
-import { parseIngredients, setDraft, useDraft } from "@/lib/scan-store";
+import { parseIngredients, parseOcrIngredients, setDraft, useDraft } from "@/lib/scan-store";
 
 export const Route = createFileRoute("/review")({
   head: () => ({
@@ -63,11 +63,16 @@ function ReviewPage() {
                 value={draft.ocrText ?? ""}
                 onChange={(event) => {
                   const text = event.target.value;
-                  setDraft({ ocrText: text, ingredients: parseIngredients(text), ocrConfidence: null, ocrError: null });
+                  setDraft({ ocrText: text, ingredients: parseOcrIngredients(text), ocrConfidence: null, ocrError: null, ocrUncertainSegments: [] });
                 }}
                 placeholder="Enter the ingredient list, separated by commas or new lines"
                 className={inputCls}
               />
+              {draft.ocrUncertainSegments.length > 0 && (
+                <Notice>
+                  Check unclear text against the label: {draft.ocrUncertainSegments.join(", ")}
+                </Notice>
+              )}
             </div>
           )}
           <ul className="space-y-2" aria-label="Ingredients">

@@ -43,21 +43,21 @@ function ScanPage() {
       const message = "Please choose a valid image file, such as a JPEG or PNG. You can enter the ingredients manually instead.";
       clearExisting();
       setError(message);
-      setDraft({ source: "photo", imageName: null, imagePreview: null, imageFile: null, ocrText: "", ocrConfidence: null, ocrError: message, ingredients: [] });
+      setDraft({ source: "photo", imageName: null, imagePreview: null, imageFile: null, ocrText: "", ocrConfidence: null, ocrError: message, ocrUncertainSegments: [], ingredients: [] });
       return;
     }
     if (file.size === 0) {
       const message = "This image file is empty or invalid. Choose another image or enter the ingredients manually.";
       clearExisting();
       setError(message);
-      setDraft({ source: "photo", imageName: null, imagePreview: null, imageFile: null, ocrText: "", ocrConfidence: null, ocrError: message, ingredients: [] });
+      setDraft({ source: "photo", imageName: null, imagePreview: null, imageFile: null, ocrText: "", ocrConfidence: null, ocrError: message, ocrUncertainSegments: [], ingredients: [] });
       return;
     }
     if (file.size > MAX_MB * 1024 * 1024) {
       const message = `Image must be under ${MAX_MB} MB. Choose a smaller image or enter the ingredients manually.`;
       clearExisting();
       setError(message);
-      setDraft({ source: "photo", imageName: null, imagePreview: null, imageFile: null, ocrText: "", ocrConfidence: null, ocrError: message, ingredients: [] });
+      setDraft({ source: "photo", imageName: null, imagePreview: null, imageFile: null, ocrText: "", ocrConfidence: null, ocrError: message, ocrUncertainSegments: [], ingredients: [] });
       return;
     }
     if (draft.imagePreview) URL.revokeObjectURL(draft.imagePreview);
@@ -72,18 +72,19 @@ function ScanPage() {
       ocrText: null,
       ocrConfidence: null,
       ocrError: null,
+      ocrUncertainSegments: [],
       ingredients: [],
     });
     void recognizeIngredientLabel(file, (value) => {
       if (requestId === requestRef.current) setProgress(value);
     }).then((result) => {
       if (requestId !== requestRef.current) return;
-      setDraft({ ocrText: result.text, ingredients: result.ingredients, ocrConfidence: result.confidence, ocrError: null });
+      setDraft({ ocrText: result.text, ingredients: result.ingredients, ocrConfidence: result.confidence, ocrUncertainSegments: result.uncertainSegments, ocrError: null });
     }).catch((cause: unknown) => {
       if (requestId !== requestRef.current) return;
       const message = cause instanceof Error ? cause.message : "The photo could not be read. Enter the ingredients manually.";
       setError(message);
-      setDraft({ ocrText: "", ocrConfidence: null, ocrError: message, ingredients: [] });
+      setDraft({ ocrText: "", ocrConfidence: null, ocrError: message, ocrUncertainSegments: [], ingredients: [] });
     }).finally(() => {
       if (requestId === requestRef.current) setRecognizing(false);
     });
@@ -113,7 +114,7 @@ function ScanPage() {
               setRecognizing(false);
               setError(null);
               if (draft.imagePreview) URL.revokeObjectURL(draft.imagePreview);
-              setDraft({ imagePreview: null, imageName: null, imageFile: null, ocrText: null, ocrConfidence: null, ocrError: null, ingredients: [] });
+              setDraft({ imagePreview: null, imageName: null, imageFile: null, ocrText: null, ocrConfidence: null, ocrError: null, ocrUncertainSegments: [], ingredients: [] });
             }}>
               <X className="h-4 w-4" aria-hidden /> Remove
             </button>
